@@ -1,0 +1,40 @@
+{
+  "name": "file-down",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "Promise": "^1.0.5",
+    "async-exec-cmd": "^2.0.2",
+    "asyncawait": "^1.0.6",
+    "body-parser": "~1.18.2",
+    "cheerio": "^1.0.0-rc.2",
+    "child-process": "^1.0.2",
+    "child_process": "^1.0.2",
+    "chilkat_node6_linux64": "^9.50.70",
+    "chilkat_node8_linux64": "^9.50.73",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "ejs": "~2.5.7",
+    "electron-pdf": "^1.2.2",
+    "express": "~4.15.5",
+    "html-to-text": "^3.3.0",
+    "htmldom": "^1.0.1",
+    "http": "0.0.0",
+    "moment": "^2.20.1",
+    "morgan": "~1.9.0",
+    "node-7z": "^0.4.0",
+    "node-zip": "^1.1.1",
+    "request": "^2.83.0",
+    "response": "^0.18.0",
+    "serve-favicon": "~2.4.5",
+    "socket.io": "^2.0.4",
+    "string": "^3.3.3",
+    "string-to-dom": "^0.1.5",
+    "textversionjs": "^1.0.2",
+    "websocket": "^1.0.25",
+    "zip-folder": "^1.0.0"
+  }
+}

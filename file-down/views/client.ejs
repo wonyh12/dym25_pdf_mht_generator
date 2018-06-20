@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="kor">
+<head>
+  <title>Example WebSocket</title>
+</head>
+<body>
+<script src="/javascripts/jquery-1.9.1.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+if ('WebSocket' in window) {
+  var ws = new WebSocket('ws://127.0.0.1:8080', 'example-echo');
+
+  ws.onopen = function () {
+    $('#status').text('connected');
+
+    for (var i = 0; i < 10; i++) {
+      ws.send('Hello ' + i);
+    }
+  };
+
+  ws.onmessage = function (evt) {
+    $('#messages').append($('<li>').text('Received message: ' + evt.data));
+  };
+
+  ws.onclose = function () {
+    $('#status').text('connection is closed');
+  };
+}
+else
+  $('#status').text('WebSocket not supported.');
+</script>
+
+Status: <span id="status"></span><br /><br />
+Messages: <ul id="messages"></ul>
+</body>
+</html>

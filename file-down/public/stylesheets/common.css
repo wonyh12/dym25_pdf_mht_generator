@@ -1,0 +1,50 @@
+*, html, body{padding: 0;margin: 0;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
+	.wrap_popup{ width: 800px; background: #fff;border: 2px solid #eee; padding: 10px; font-family: '맑은 고딕', '돋움', Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif"; font-size: 14px;}
+	.wrap_popup input{ vertical-align: middle;}
+	.wrap_popup input[type="text"], .wrap_popup select{font-family: '맑은 고딕'; border:1px solid #ccc; padding: 2px 10px 4px; width:100%; height: 32px; color: #444; vertical-align:text-top;}
+	.wrap_popup input::-webkit-input-placeholder { color: #bbb; }
+	.wrap_popup h1, .wrap_popup h2{ font-weight: 600; color: #565656; letter-spacing: -1px}	
+	.wrap_popup h1{ font-size: 24px}	
+	.wrap_popup h2{ font-size: 16px}
+	.wrap_popup .list_box, .wrap_popup .download_option{ background: #f7f7f7; padding: 10px 20px;margin: 10px 0;}
+	.wrap_popup table{ margin: 10px 0; width:100%}
+	.wrap_popup table tr th{text-align: left; background: #959596; font-size: 13px; color: #fff; padding-left:14px; height: 38px; border-bottom: 1px solid #f7f7f7;}
+	.wrap_popup table tr td{padding:2px 10px;}
+	.wrap_popup textarea{font-family: '맑은 고딕'; display: block; border: 0; resize: none; width: 100%; height: 250px; background: #fff; padding: 10px 20px; margin: 10px 0; overflow-y: scroll; }
+	.wrap_popup .btn_area{ text-align: right;}
+	.wrap_popup .btn_area input[type="button"]{ font-family: '맑은 고딕';background: #fff; border: 1px solid #ccc; border-radius: 3px; padding: 4px 14px 8px; cursor:pointer;}
+	.wrap_popup .btn_area input[type="button"]:hover{background: #f4f4f4; border: 1px solid #bbb; }
+	.wrap_popup .btn_area input[type="button"].selected{ background:#2e8ffb; border-color: #2e8ffb; color: #fff; font-weight: 600; }
+
+
+	.wrap_popup div ul{font-family: '맑은 고딕'; display: block; border: 0; resize: none; width: 100%; height: 250px; background: #fff; padding: 10px 20px; margin: 10px 0; overflow-y: scroll; list-style:none;}
+
+
+	.progress-wrap{ width: 100%; margin: 10px 0; border-radius: 6px; background:#f7f7f7; border: 1px solid #ccc;}
+	.progress{ margin: 0; padding-top: 8px; background: #2e8ffb; width: 5%; height: 38px; border-radius: 5px; text-align: center; background-size: 65px 65px;
+	  background-image: linear-gradient(135deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent); 
+	  background-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);            
+	  animation: animate-bars 3s linear infinite;
+	  -webkit-animation: animate-bars 3s linear infinite;
+	  -moz-animation: animate-bars 3s linear infinite;   
+	  -ms-animation: animate-bars 3s linear infinite; 
+	  -o-animation: animate-bars 3s linear infinite; 
+	}
+	@-webkit-keyframes animate-bars {
+	  0% { background-position: 0px 0px; }
+	  100% { background-position: 260px 0px; }
+	}
+	@-moz-keyframes animate-bars{
+	  0% { background-position: 0px 0px;  }
+	  100% { background-position: 260px 0px;  }
+	}
+	@-ms-keyframes animate-bars{
+	  0% { background-position: 0px 0px;  }
+	  100% { background-position: 260px 0px;  }
+	}
+	@-o-keyframes animate-bars{
+	  0% { background-position: 0px 0px;  }
+	  100% { background-position: 260px 0px;  }
+	}
+	.countup{ position: relative; color: #fff; text-align: center; }
+

@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=11; IE=Edge;"/>
+<title><%= title %></title>
+<link rel="stylesheet" href="/stylesheets/common.css" />
+<link rel="stylesheet" href="/javascripts/jquery-ui.1.10.4.css" />
+<script type="text/javascript" src="/javascripts/jquery-1.9.1.min.js" ></script>
+<script type="text/javascript" src="/javascripts/jquery-form.js"></script>
+<script type="text/javascript" src="/javascripts/jquery-ui.1.10.4.js"></script>	
+
+<script type="text/javascript">
+	var index = 0;
+	var settingVO = {
+	    type: "resume", // 이력서(resume) , 수험표(apply_print), 제작수험표(exam_card)
+	    fileType: "mht", // 다운받을 파일 타입 (mht, pdf)
+	    recruit_name: "lh", // 업체 영문명(도메인)
+	    recruit_folder_name: "", // 폴더명과 디비명이 다를때 이것도 입력 같으면 입력 하지 말것
+	    recruit_num: "899", // 업체 공고번호
+	    request_step_condition: "2", // 진행상태 숫자 전체일땐 "" ex) 7 (7이 최종합격란이고 최종합격 인 애들만 뽑는다고 가정할때)
+	    limit_total: 10, // 테스트로 몇개만 하고 싶을땐 입력 ex) 10 // 총갯수를 적어줘야함 //
+	    condition_name: "", // 진행상태 이름설정, 안쓸때는 "" 처리
+	    snum: "Y", // Y 값 넣으면 수험번호 있는 애들만.
+	    etc_col: "", //print_num, mapping1 등등 필요한 컬럼 추가
+	    folderGubun: { // 폴더 구분 field1 > field2 > field3 > field4 > 개인별
+	        "field1": "getName('field1')"
+	        ,"field2": "getName('field2')"
+	        ,"field3": "getName('field3')"
+	        ,"field4": "getName('field4')"
+	        ,"개인별": "getName()"
+	    },
+	    field1: "", // 분야명 입력 시 해당 분야만 다운로드
+	    field2: "",
+	    field3: "",
+	    field4: "",
+	    limit_snum: "0",
+	    limit_setting: 300,
+	    limit_total_loop: "",
+	    filePwd: "123456789"
+	};
+
+	function updateVO(vo) {
+	    vo.type = vo.type.toLowerCase();
+	    vo.fileType = vo.fileType.toLowerCase();
+	    vo.limit_total_loop = Math.ceil(vo.limit_total / vo.limit_setting);
+	    if (vo.limit_total < vo.limit_setting) {
+	        vo.limit_setting = vo.limit_total
+	    }
+	    if (!vo.recruit_folder_name) {
+	        vo.recruit_folder_name = vo.recruit_name;
+	    }
+	    return vo;
+	}
+
+	$(document).ready(function() {
+	
+		$('select[name=type]').val("<%= type %>").prop("selected", true);
+		$('select[name=fileType]').val("<%= fileType %>").prop("selected", true);
+		$('select[name=request_step_condition]').val("<%= request_step_condition %>").prop("selected", true);
+		$('select[name=snum]').val("<%= snum %>").prop("selected", true);
+		
+		$('#downBtn').css("display","none");
+		
+		
+	});
+	
+	function fileDown(){
+		$('[name=down_recruit_name]').val($('[name=recruit_name]').val());
+		$('#download').submit();	
+	}
+	
+	function createListAjax(){
+		
+		if(validation()){
+			
+			$('#createBtn').css("display","none");
+			
+			$.ajax({
+			    type : 'POST',
+			    url : '/create',
+			    data : $('[name=downform]').serialize(),
+			    error : function(error) {
+			        alert("List Create Error!");
+			    },
+			    success : function(data) {
+			    	splitList(data);
+			    },
+			    complete : function() {
+			        //$('#downBtn').css("display","");   
+			    }
+			});
+			
+		}
+		
+		
+	}
+	
+	function createFileAjax(urlList, fileList){
+		var count;
+		$.ajax({
+		    type : 'POST',
+		    url : '/createFile',
+		    data : {"urlList" : urlList[index], "fileList" : fileList[index]},
+		    error : function(error) {
+		        alert("File Create Error!");
+		    },
+		    success : function(data) {
+		    	//$('#resultArea').append(data);
+		    	$('#resultArea').append("<li><a href=" + data + " target='_blank'>"+data+"</a></li>");
+		    	if(index == 0){
+		    		$('#resultArea>li:first>a').get(0).click();
+
+		    	}
+		    },
+		    complete : function() {
+		    	index++;
+		    	
+				count = index/urlList.length*100;
+				progress(count);
+				
+            	
+		    	if (index < urlList.length ){	
+		    		createFileAjax(urlList, fileList);
+		    	}else {
+		    		index = 0;
+		    		$('#resultArea').append("---------------------------------------------------END---------------------------------------------------<br/>");
+		    		//$('#downBtn').css("display","");
+		    		zipCreateAjax();
+		    	}
+		    	
+		    	
+		    }
+		});
+	}
+	function zipCreateAjax(){
+		
+		$('#resultArea').append("----------------------------------------------압축파일 생성----------------------------------------------<br/>");
+		$.ajax({
+		    type : 'POST',
+		    url : '/zipCreate',
+		    data : $('[name=downform]').serialize(),
+		    error : function(error) {
+		        alert("Zip Create Error!");
+		    },
+		    success : function(data) {
+		    	$('#resultArea').append("--------------------------------------------압축파일 생성완료--------------------------------------------<br/>");
+		    	$('#downBtn').css("display","");
+		    	$('#createListArea').val('');
+		    },
+		    complete : function() {
+		    		
+		    }
+		});
+
+	}
+	function splitList(data){
+		var urlList = data.match(/(http.+)/g),
+			fileList = data.match(/(download.+)/g);
+
+		    //$('#resultArea').append(urlList.join("\n"));
+		    $('#createListArea').append(fileList.join("\n"));
+		    $('#resultArea').append("--------------------------------------------------START--------------------------------------------------<br/>");
+		    createFileAjax(urlList, fileList);
+	}
+	
+	function validation(){
+		if (!$("[name='type']").val()) return $("[name='type']").focus(), alert("파일 양식을 선택해 주세요."), false;
+		if (!$("[name='recruit_name']").val()) return $("[name='recruit_name']").focus(), alert("업체 영문명을 입력해 주세요."), false;
+		if (!$("[name='recruit_num']").val()) return $("[name='recruit_num']").focus(), alert("공고번호를 입력해 주세요."), false;
+		if (!$("[name='limit_total']").val()) return $("[name='limit_total']").focus(), alert("파일 개수를 입력해 주세요."), false;
+		if (!$("[name='filePwd']").val()) return $("[name='filePwd']").focus(), alert("압축 패스워드를 입력해 주세요."), false;
+		
+		return true;
+	}
+	  
+	
+	function progress(count){
+		$(".progress").css( "width",count+"%");
+		$(".countup").html(Math.round(count)+"%"); 
+		if(count == 100){
+			$("#downBtn").addClass('selected');	
+		}
+	}
+
+	
+</script>
+
+
+	</head>
+	<body>
+		<div class="wrap_popup">
+			<h1>MHT, PDF 다운로드</h1>
+			<div class="download_option">
+				<h2>다운로드 옵션</h2>
+				<form name="downform" action="/create" method="post">
+					<fieldset>
+						<table border="0" cellpadding="0" cellspacing="0" class="tbl_option">
+							<colgroup>
+								<col width="20%" />
+								<col width="30%" />
+								<col width="20%" />
+								<col width="30%" />
+							</colgroup>
+							<tbody>
+								<tr>
+									<th width="120px">파일 양식</th>
+									<td>
+										<select name="type">
+											<option value="resume" selected="selected">이력서</option>
+											<option value="apply_print">수험표</option>
+											<option value="exam_card">제작수험표</option>
+										</select>
+									</td>
+									<th>전형상태</th>
+									<td>
+										<select name="request_step_condition">
+											<option value="" selected="selected">전체</option>
+											<option value="1">서류전형</option>
+											<option value="2">필기시험</option>
+											<option value="4">1차면접</option>
+											<option value="5">2차면접</option>
+											<option value="7">최종합격</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<th>파일 종류</th>
+									<td>
+										<select name="fileType">
+											<option value="mht" selected="selected">MHT</option>
+											<option value="pdf">PDF</option>
+										</select>
+									</td>
+									<th>수험번호 여부</th>
+									<td>
+										<select name="snum">
+											<option value="" selected="selected">N</option>
+											<option value="Y">Y</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<th>업체 영문명</th>
+									<td><input type="text" name="recruit_name" placeholder="ex) lh" value="<%= recruit_name %>" /></td>
+									<th>파일 개수</th>
+									<td><input type="text" name="limit_total" placeholder="ex) 160" value="<%= limit_total %>" /></td>
+								</tr>
+								<tr>
+									<th>공고번호</th>
+									<td><input type="text" name="recruit_num" placeholder="ex) 899" value="<%= recruit_num %>" /></td>
+									<th>압축 패스워드</th>
+									<td><input type="text" name="filePwd" placeholder="ex) qwert12345" value="<%= filePwd %>" /></td>
+								</tr>
+							</tbody>
+						</table>
+						
+					</fieldset>
+				</form>
+				
+				
+			</div>
+			<div class="btn_area">
+					<input type="button" alt="파일생성" value="파일생성" class="btn_file_crt" id="createBtn" onclick="createListAjax();" />
+					<input type="button" alt="다운로드" value="다운로드" class="btn_download" id="downBtn" onclick="fileDown();"/>
+				</div>
+			
+			
+			<div id="downloadDiv">
+				<form id="download" name="download" action="/download" method="post">
+					<input type="hidden" name="down_recruit_name" placeholder="ex) lh" value="" />
+				</form>
+				<form id="create" name="create" action="/createFile" method="post">
+					<input type="hidden" name="create_recruit_name" placeholder="ex) lh" value="" />
+				</form>
+
+			</div>
+			
+			<div class="progress-wrap">
+		    	<div class="progress" >
+		    		<span class="countup"></span>
+		    	</div>  
+		    </div>
+		    
+		    <div class="list_box">
+				<h2>리스트</h2>
+				<textarea id="createListArea" class="createListArea" style="width:900px; height:300px;display:none;" readonly></textarea>
+				<!--<textarea id="resultArea" class="resultArea" readonly></textarea>-->
+				<div>
+					<ul id="resultArea">
+					</ul>
+				</div>
+				
+			</div>
+		    
+		</div>
+	</body>
+</html>
