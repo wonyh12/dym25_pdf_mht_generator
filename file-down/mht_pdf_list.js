@@ -71,7 +71,7 @@ function updateVO(vo) {
     }
     
     return vo;
-}https://saramin.ezwel.com/cuser/login/loginForm.ez?url=&clientFamilyNm=null&goUrl=
+}
 
 function listUpStart(vo, res) {
 	

@@ -29,18 +29,6 @@ const logFile = function(isSuccess) {
 
 /*********************************** 세팅 끝 ***********************************/
 
-//downStart(settingVO);
-
-// function chilkatObjVO(os) {
-//     return {
-//         'win32': 'chilkat_node6_win32',
-//         'linux': {
-//             'arm': 'chilkat_node6_arm',
-//             'x86': 'chilkat_node6_linux32'
-//         }[os.arch()] || 'chilkat_node8_linux64',
-//         'darwin': 'chilkat_node6_macosx'
-//     }[os.platform()];
-// }
 
 function chilkatObjVO(os) {
     return {
@@ -84,14 +72,12 @@ function mhtDown(req, res) {
     }
     
     console.log("-------------------------------------start-------------------------------------");
-    //for (var i = 0, len = urlList.length; i < len; i++) {
-        //fileNameCheck(i, vo);
+
         mhtMakeState = (!!mht.GetAndSaveMHT(req.body.urlList, req.body.fileList));
         //logAction(vo, i, filePathList, mhtMakeState);
-
        	res.write( req.body.fileList +'\n');
        	console.log( req.body.fileList +'\n' );
-    //}
+
     res.end();
     console.log("--------------------------------------end--------------------------------------");
     
@@ -99,7 +85,6 @@ function mhtDown(req, res) {
 
 function pdfDown(req, res) {
 	var pdfMake = spawn('electron-pdf', [req.body.urlList, req.body.fileList, '-m 0']);
-	//var pdfMake = spawn('electron-pdf', ['https://www.naver.com', req.body.fileList, '-m 0']);
 				console.log("-------------------------------------start-------------------------------------");
 				pdfMake.on('exit', function(code) {
 					res.write( req.body.fileList +'\n');
@@ -123,11 +108,6 @@ function logAction(vo, i, list, state, exception) {
     }
 }
 
-function fileNameCheck(i, vo) {
-    if (fs.existsSync(filePathList[i])) {
-        filePathList[i] = filePathList[i].replace("." + vo.fileType, i + "." + vo.fileType);
-    }
-}
 
 function getDateTime() {
     var dateTime = moment().format('YYYY-MM-DD HH:mm:ss');
