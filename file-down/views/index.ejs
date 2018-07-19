@@ -12,46 +12,7 @@
 
 <script type="text/javascript">
 	var index = 0;
-	var settingVO = {
-	    type: "resume", // 이력서(resume) , 수험표(apply_print), 제작수험표(exam_card)
-	    fileType: "mht", // 다운받을 파일 타입 (mht, pdf)
-	    recruit_name: "lh", // 업체 영문명(도메인)
-	    recruit_folder_name: "", // 폴더명과 디비명이 다를때 이것도 입력 같으면 입력 하지 말것
-	    recruit_num: "899", // 업체 공고번호
-	    request_step_condition: "2", // 진행상태 숫자 전체일땐 "" ex) 7 (7이 최종합격란이고 최종합격 인 애들만 뽑는다고 가정할때)
-	    limit_total: 10, // 테스트로 몇개만 하고 싶을땐 입력 ex) 10 // 총갯수를 적어줘야함 //
-	    condition_name: "", // 진행상태 이름설정, 안쓸때는 "" 처리
-	    snum: "Y", // Y 값 넣으면 수험번호 있는 애들만.
-	    etc_col: "", //print_num, mapping1 등등 필요한 컬럼 추가
-	    folderGubun: { // 폴더 구분 field1 > field2 > field3 > field4 > 개인별
-	        "field1": "getName('field1')"
-	        ,"field2": "getName('field2')"
-	        ,"field3": "getName('field3')"
-	        ,"field4": "getName('field4')"
-	        ,"개인별": "getName()"
-	    },
-	    field1: "", // 분야명 입력 시 해당 분야만 다운로드
-	    field2: "",
-	    field3: "",
-	    field4: "",
-	    limit_snum: "0",
-	    limit_setting: 300,
-	    limit_total_loop: "",
-	    filePwd: "123456789"
-	};
-
-	function updateVO(vo) {
-	    vo.type = vo.type.toLowerCase();
-	    vo.fileType = vo.fileType.toLowerCase();
-	    vo.limit_total_loop = Math.ceil(vo.limit_total / vo.limit_setting);
-	    if (vo.limit_total < vo.limit_setting) {
-	        vo.limit_setting = vo.limit_total
-	    }
-	    if (!vo.recruit_folder_name) {
-	        vo.recruit_folder_name = vo.recruit_name;
-	    }
-	    return vo;
-	}
+	
 
 	$(document).ready(function() {
 	
@@ -70,7 +31,7 @@
 		$('#download').submit();	
 	}
 	
-	function createListAjax(){
+	function createList(){
 		
 		if(validation()){
 			
@@ -96,7 +57,7 @@
 		
 	}
 	
-	function createFileAjax(urlList, fileList){
+	function createFile(urlList, fileList){
 		var count;
 		$.ajax({
 		    type : 'POST',
@@ -108,6 +69,8 @@
 		    success : function(data) {
 		    	//$('#resultArea').append(data);
 		    	$('#resultArea').append("<li><a href=" + data + " target='_blank'>"+data+"</a></li>");
+				$('#resultArea').scrollTop($('#resultArea').prop('scrollHeight'));
+
 		    	if(index == 0){
 		    		$('#resultArea>li:first>a').get(0).click();
 
@@ -121,21 +84,23 @@
 				
             	
 		    	if (index < urlList.length ){	
-		    		createFileAjax(urlList, fileList);
+		    		createFile(urlList, fileList);
 		    	}else {
 		    		index = 0;
 		    		$('#resultArea').append("---------------------------------------------------END---------------------------------------------------<br/>");
+					$('#resultArea').scrollTop($('#resultArea').prop('scrollHeight'));
 		    		//$('#downBtn').css("display","");
-		    		zipCreateAjax();
+		    		zipCreate();
 		    	}
 		    	
 		    	
 		    }
 		});
 	}
-	function zipCreateAjax(){
+	function zipCreate(){
 		
-		$('#resultArea').append("----------------------------------------------압축파일 생성----------------------------------------------<br/>");
+		$('#resultArea').append("--------------------------------------------압축파일 생성 중----------------------------------------------<br/>");
+		$('#resultArea').scrollTop($('#resultArea').prop('scrollHeight'));
 		$.ajax({
 		    type : 'POST',
 		    url : '/zipCreate',
@@ -145,11 +110,12 @@
 		    },
 		    success : function(data) {
 		    	$('#resultArea').append("--------------------------------------------압축파일 생성완료--------------------------------------------<br/>");
-		    	$('#downBtn').css("display","");
+				$('#resultArea').scrollTop($('#resultArea').prop('scrollHeight'));
 		    	$('#createListArea').val('');
 		    },
 		    complete : function() {
-		    		
+				
+		    	$('#downBtn').css("display","");
 		    }
 		});
 
@@ -158,10 +124,9 @@
 		var urlList = data.match(/(http.+)/g),
 			fileList = data.match(/(download.+)/g);
 
-		    //$('#resultArea').append(urlList.join("\n"));
 		    $('#createListArea').append(fileList.join("\n"));
 		    $('#resultArea').append("--------------------------------------------------START--------------------------------------------------<br/>");
-		    createFileAjax(urlList, fileList);
+		    createFile(urlList, fileList);
 	}
 	
 	function validation(){
@@ -183,7 +148,7 @@
 		}
 	}
 
-	
+
 </script>
 
 
@@ -252,6 +217,23 @@
 									<th>압축 패스워드</th>
 									<td><input type="text" name="filePwd" placeholder="ex) qwert12345" value="<%= filePwd %>" /></td>
 								</tr>
+								<tr>
+									<th>서버</th>
+									<td>
+										<select name="server">
+											<option value="1">개발</option>
+											<option value="2" selected="selected">상용</option>
+										</select>
+									</td>
+									<th>폴더구조</th>
+									<td>
+										<input type="checkbox" name="folderGubun" value="field1"> 구분1<br />
+										<input type="checkbox" name="folderGubun" value="field2"> 구분2<br />
+										<input type="checkbox" name="folderGubun" value="field3"> 구분3<br />
+										<input type="checkbox" name="folderGubun" value="field4"> 구분4<br />
+										<input type="checkbox" name="folderGubun" value="personal"> 개인별
+									</td>
+								</tr>
 							</tbody>
 						</table>
 						
@@ -261,7 +243,8 @@
 				
 			</div>
 			<div class="btn_area">
-					<input type="button" alt="파일생성" value="파일생성" class="btn_file_crt" id="createBtn" onclick="createListAjax();" />
+					<input type="button" alt="파일생성" value="파일생성" class="btn_file_crt" id="createBtn" onclick="createList();" />
+					<!-- <input type="button" alt="압축" value="압축" class="btn_file_crt" id="createZipBtn" onclick="zipCreate();" /> -->
 					<input type="button" alt="다운로드" value="다운로드" class="btn_download" id="downBtn" onclick="fileDown();"/>
 				</div>
 			
@@ -269,9 +252,6 @@
 			<div id="downloadDiv">
 				<form id="download" name="download" action="/download" method="post">
 					<input type="hidden" name="down_recruit_name" placeholder="ex) lh" value="" />
-				</form>
-				<form id="create" name="create" action="/createFile" method="post">
-					<input type="hidden" name="create_recruit_name" placeholder="ex) lh" value="" />
 				</form>
 
 			</div>

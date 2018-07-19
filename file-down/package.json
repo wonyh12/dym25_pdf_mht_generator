@@ -36,5 +36,8 @@
     "textversionjs": "^1.0.2",
     "websocket": "^1.0.25",
     "zip-folder": "^1.0.0"
+  },
+  "devDependencies": {
+    "electron": "^2.0.5"
   }
 }

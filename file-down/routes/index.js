@@ -3,7 +3,7 @@ var router = express.Router();
 
 var filedown = require('../mht_pdf_down');
 
-var fileList = require('../mht_pdf_list');
+var createList = require('../mht_pdf_list');
 
 var zipCreate = require('../zipCreate');
 
@@ -23,7 +23,7 @@ var settingVO = {
         ,"field2": "getName('field2')"
         ,"field3": "getName('field3')"
         ,"field4": "getName('field4')"
-        ,"개인별": "getName()"
+        ,"personal": "getName()"
     },
     field1: "", // 분야명 입력 시 해당 분야만 다운로드
     field2: "",
@@ -32,27 +32,45 @@ var settingVO = {
     limit_snum: "0",
     limit_setting: 300,
     limit_total_loop: "",
-    filePwd: "123456789"
+    filePwd: "123456789",
+	server: ""
 };
-
-function initVO(vo){
-	vo.recruit_folder_name = "";
-	vo.etc_col = "";
-	vo.field1 = "";
-    vo.field2 = "";
-    vo.field3 = "";
-    vo.field4 = "";
-    vo.limit_snum = "0";
-    vo.limit_setting = 300;
-    vo.limit_total_loop = "";
+function setVO(req){
+	settingVO.type = req.body.type;
+	settingVO.fileType = req.body.fileType;
+	settingVO.recruit_name = req.body.recruit_name;
+	settingVO.recruit_folder_name = "";
+	settingVO.recruit_num = req.body.recruit_num;
+	settingVO.request_step_condition = req.body.request_step_condition;
+	settingVO.limit_total = req.body.limit_total;
+	settingVO.condition_name = "";
+	settingVO.snum = req.body.snum;
+	settingVO.etc_col = "";
+	settingVO.folderGubun = req.body.folderGubun.toString().split(",");
+	// settingVO.folderGubun= { // 폴더 구분 field1 > field2 > field3 > field4 > 개인별
+	// "field1": "getName('field1')"
+	// ,"field2": "getName('field2')"
+	// ,"field3": "getName('field3')"
+	// ,"field4": "getName('field4')"
+	// ,"personal": "getName()"
+	// };
+	settingVO.field1 = "";
+	settingVO.field2 = "";
+	settingVO.field3 = "";
+	settingVO.field4 = "";
+	settingVO.limit_snum = "0";
+	settingVO.limit_setting = 300;
+	settingVO.limit_total_loop = "";
+	settingVO.filePwd = req.body.filePwd;
+	settingVO.server = req.body.server;
 }
-
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: '파일 다운로드',
-					  	type : req.query.type,
-					  	fileType : req.query.fileType,
+	console.log('index');
+	res.render('index', { title: '파일 다운로드',
+						type : req.query.type,
+						fileType : req.query.fileType,
   						recruit_name : req.query.recruit_name,
   						recruit_num : req.query.recruit_num,
   						request_step_condition : req.query.request_step_condition,
@@ -60,77 +78,44 @@ router.get('/', function(req, res, next) {
   						limit_total : req.query.limit_total,
   						filePwd : req.query.filePwd,
   						fileYN : ''
-  });
+	});
 });
 
-
-
-//router.post('/', function(req, res, next) {
-//	console.log(req.body);
-//	
-//	settingVO.type = req.body.type;
-//	settingVO.recruit_name = req.body.recruit_name;
-//	settingVO.recruit_num = req.body.recruit_num;
-//	settingVO.request_step_condition = req.body.request_step_condition;
-//	settingVO.snum = req.body.snum;
-//	settingVO.limit_total = req.body.limit_total;
-//	settingVO.filePwd = req.body.filePwd;
-//	
-//	filedown(settingVO,res);
-//
-//  	res.render('index', { title: '파일 다운로드',
-//					  	type : req.body.type,
-//					  	fileType : req.body.fileType,
-//  						recruit_name : req.body.recruit_name,
-//  						recruit_num : req.body.recruit_num,
-//  						request_step_condition : req.body.request_step_condition,
-//  						snum : req.body.snum,
-//  						limit_total : req.body.limit_total,
-//  						filePwd : req.query.filePwd,
-//  						fileYN : 'Y'
-//  });
-//});
-
 router.post('/create', function(req, res, next) {
+	console.log('post create');
 	console.log(req.body);
-	
-	initVO(settingVO);
-	
-	settingVO.type = req.body.type;
-	settingVO.recruit_name = req.body.recruit_name;
-	settingVO.recruit_num = req.body.recruit_num;
-	settingVO.request_step_condition = req.body.request_step_condition;
-	settingVO.snum = req.body.snum;
-	settingVO.limit_total = req.body.limit_total;
-	settingVO.filePwd = req.body.filePwd;
+
+	setVO(req);
 	
 	console.log(settingVO);
 	
-	fileList(settingVO, res);
-	//next();
+	createList(settingVO, res);
+
 
 });
 
 router.post('/createFile', function(req, res, next) {
+	console.log('post createFile');
 	console.log(req.body);
 	
 	filedown(settingVO, req, res);
-	//next();
 
 });
+
 router.post('/zipCreate', function(req, res, next) {
+	console.log('post zipCreate');
 	console.log(req.body);
 	console.log(req.body.recruit_name);
 	zipCreate(settingVO, res, req);
-	//next();
 
 });
 
 router.post('/download', function(req, res, next) {
-
+	console.log('post download');
 	var file = './download/'+req.body.down_recruit_name+'.zip';
 	console.log(file);
   	res.download(file); 
+
 });
 
 

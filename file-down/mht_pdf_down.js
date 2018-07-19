@@ -31,13 +31,24 @@ const logFile = function(isSuccess) {
 
 //downStart(settingVO);
 
+// function chilkatObjVO(os) {
+//     return {
+//         'win32': 'chilkat_node6_win32',
+//         'linux': {
+//             'arm': 'chilkat_node6_arm',
+//             'x86': 'chilkat_node6_linux32'
+//         }[os.arch()] || 'chilkat_node8_linux64',
+//         'darwin': 'chilkat_node6_macosx'
+//     }[os.platform()];
+// }
+
 function chilkatObjVO(os) {
     return {
         'win32': 'chilkat_node6_win32',
         'linux': {
             'arm': 'chilkat_node6_arm',
             'x86': 'chilkat_node6_linux32'
-        }[os.arch()] || 'chilkat_node8_linux64',
+        }[os.arch()] || 'chilkat_node6_linux64',
         'darwin': 'chilkat_node6_macosx'
     }[os.platform()];
 }
@@ -86,42 +97,21 @@ function mhtDown(req, res) {
     
 }
 
-
-function pdfDown(vo) {
-
-    var textArray = [];
-    for (var i = 0, len = urlList.length; i < len; i++) {
-        fileNameCheck(i, vo);
-        textArray[i] = 'electron-pdf ' + urlList[i] + ' ' + filePathList[i] + ' ';
-    }
-    var pdfStr,
-        index = 0,
-        cmdPdf = function() {
-            console.log("-------------------------------------start-------------------------------------");
-            try {
-                cmd(textArray[index], callback);
-            } catch (exception) {
-                logAction(index, filePathList, false, exception);
-            }
-        },
-        callback = function(err, res, code, buffer) {
-            var isError = (!err),
-                isRunning = (index != (textArray.length - 1)),
-                running = function() {
-                    index++;
-                    cmd(textArray[index], callback);
-                },
-                end = function() {
-                    console.log("--------------------------------------end--------------------------------------");
-                },
-                pdfDownload = function() {
-                    return isRunning ? running() : end();
-                };
-            logAction(vo, index, filePathList, isError, err);
-            pdfDownload();
-        };
-    cmdPdf();
+function pdfDown(req, res) {
+	var pdfMake = spawn('electron-pdf', [req.body.urlList, req.body.fileList, '-m 0']);
+	//var pdfMake = spawn('electron-pdf', ['https://www.naver.com', req.body.fileList, '-m 0']);
+				console.log("-------------------------------------start-------------------------------------");
+				pdfMake.on('exit', function(code) {
+					res.write( req.body.fileList +'\n');
+       				console.log( req.body.fileList +'\n' );
+					res.end();
+					console.log("--------------------------------------end--------------------------------------");
+				});
+				pdfMake.on('error', function(err) {
+					console.log(err);
+				});
 }
+
 
 function logAction(vo, i, list, state, exception) {
     console.log(messageVO(vo, state, i, list));

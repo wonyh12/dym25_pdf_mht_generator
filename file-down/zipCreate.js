@@ -16,19 +16,27 @@ var zipFolder = require('zip-folder');
 /*********************************** 세팅 끝 ***********************************/
 
 
-
-
 function zipCreate(vo, res, req){
-	var zip = spawn('zip',['-r9P', req.body.filePwd, 'download/'+req.body.recruit_name+'.zip', 'download/'+req.body.recruit_name+'/']);
-	zip.on('exit', function(code) {
-		console.log('zip Created!!');
-	});
-	zip.on('error', function(err) {
-		console.log(err);
-	});
-	res.end();
-}
+	zipFolder('download/'+req.body.recruit_name, 'download/'+req.body.recruit_name+'_temp.zip', function(err) {
+		if(err) {
+			console.log('oh no!', err);
+		} else {
 
+			console.log('temp zip Created');
+			var zip = spawn('zip',['-r1P', req.body.filePwd, 'download/'+req.body.recruit_name+'.zip', 'download/'+req.body.recruit_name+'_temp.zip']);
+			zip.on('exit', function(code) {
+				res.write('Y');
+				console.log('zip Created!!');
+				spawn('rm',['download/'+req.body.recruit_name+'_temp.zip']);
+				res.status(200).end();
+			});
+			zip.on('error', function(err) {
+				console.log(err);
+			});
+
+		}
+	 });
+}
 
 
 module.exports = zipCreate;
