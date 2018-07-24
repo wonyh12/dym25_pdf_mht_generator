@@ -1,11 +1,26 @@
 /*************************************************************************************/
 /*
-.v1 : mht 만 가능하던 다운로드에서 mht, pdf 다운로드 합침
-.v2 : 수험번호가 없는 지원자들 성명이 중복 될 경우 파일이 엎어짐 ( 즉 파일개수가 안맞음 )
-.v3 : 수험표 개별 다운로드 기능 추가, etc_col 기타 컬럼 추가
-.v4 : PDF 생성시 sleep 제거, 소스 리펙토링, 제작수험표 개별 다운로드 기능 추가 //2017-12-05
-.v5 : 특정분야만 다운로드 기능 추가 //2017-12-08
-node 웹서버 실행 : node ./bin/www
+
+함수 정리
+
+chilkatObjVO : os 정보를 받아서 필요한 라이브러리 호출 시킴(mht 라이브러리)
+
+logFile : 로그 파일 위치
+
+messageVO : 로그에 넣을 메세지 함수
+
+downStart : 
+	- /crateFile 실제 실행 함수
+	- fileType 값에 따라 mht, pdf 다운로드 함수 분기처리
+
+mhtDown : chilkat 사용, mht 생성
+
+pdfDown : spawn 사용, pdf 생성
+
+logAction : 로그 쌓는 함수
+
+getDateTime : 현재 시간 가져오는 함수
+
 */
 
 //const exec = require('child_process');
@@ -29,6 +44,16 @@ const logFile = function(isSuccess) {
 
 /*********************************** 세팅 끝 ***********************************/
 
+// function chilkatObjVO(os) {
+//     return {
+//         'win32': 'chilkat_node6_win32',
+//         'linux': {
+//             'arm': 'chilkat_node6_arm',
+//             'x86': 'chilkat_node6_linux32'
+//         }[os.arch()] || 'chilkat_node8_linux64',
+//         'darwin': 'chilkat_node6_macosx'
+//     }[os.platform()];
+// }
 
 function chilkatObjVO(os) {
     return {
@@ -72,12 +97,11 @@ function mhtDown(req, res) {
     }
     
     console.log("-------------------------------------start-------------------------------------");
-
         mhtMakeState = (!!mht.GetAndSaveMHT(req.body.urlList, req.body.fileList));
         //logAction(vo, i, filePathList, mhtMakeState);
+
        	res.write( req.body.fileList +'\n');
        	console.log( req.body.fileList +'\n' );
-
     res.end();
     console.log("--------------------------------------end--------------------------------------");
     

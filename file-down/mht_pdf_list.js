@@ -5,8 +5,23 @@
 .v3 : 수험표 개별 다운로드 기능 추가, etc_col 기타 컬럼 추가
 .v4 : PDF 생성시 sleep 제거, 소스 리펙토링, 제작수험표 개별 다운로드 기능 추가 //2017-12-05
 .v5 : 특정분야만 다운로드 기능 추가 //2017-12-08
-node 웹서버 실행 : node ./bin/www
-개발서버는 mht변환시 로그인 인증이 완료되었다고 뜸
+node 웹서버 실행 : node ./bin/www  or npm start
+
+
+함수 정리
+
+
+updateVO : 리스트배열 초기화, 대소문자 변경, 다운받기 전 세팅
+
+listUpStart : 
+	- /create 에서 실제 실행되는 함수
+	- json 받아와서 urlList, filePathList 로 생성
+	- 폴더 생성
+
+resList : 만들어놓은 List들을 response 시킴
+
+fileNameCheck : 파일명 중복 체크
+
 */
 
 //const exec = require('child_process');
@@ -19,8 +34,7 @@ const os = require('os');
 const fs = require('fs');
 const request = require('request');
 const moment = require('moment');
-const chilkat = require(chilkatObjVO(os));
-var zipFolder = require('zip-folder');
+
 
 
 const logFile = function(isSuccess) {
@@ -33,27 +47,6 @@ var filePathList = []; // 파일경로
 
 /*********************************** 세팅 끝 ***********************************/
 
-// function chilkatObjVO(os) {
-//     return {
-//         'win32': 'chilkat_node6_win32',
-//         'linux': {
-//             'arm': 'chilkat_node6_arm',
-//             'x86': 'chilkat_node6_linux32'
-//         }[os.arch()] || 'chilkat_node8_linux64',
-//         'darwin': 'chilkat_node6_macosx'
-//     }[os.platform()];
-// }
-
-function chilkatObjVO(os) {
-    return {
-        'win32': 'chilkat_node6_win32',
-        'linux': {
-            'arm': 'chilkat_node6_arm',
-            'x86': 'chilkat_node6_linux32'
-        }[os.arch()] || 'chilkat_node6_linux64',
-        'darwin': 'chilkat_node6_macosx'
-    }[os.platform()];
-}
 
 
 function updateVO(vo) {
